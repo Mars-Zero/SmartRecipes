@@ -1,197 +1,93 @@
-import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { useAuth } from '../auth'
-import Recipe from './Recipe'
-import { Modal ,Form,Button} from 'react-bootstrap'
-import { useForm } from 'react-hook-form'
-
-
-
-
-
-const LoggedinHome = () => {
-    const [recipes, setRecipes] = useState([]);
-    const [show, setShow] = useState(false)
-    const {register,reset,handleSubmit,setValue,formState:{errors}}=useForm()
-    const [recipeId,setRecipeId]=useState(0);
-
-    useEffect(
-        () => {
-            fetch('/recipe/recipes')
-                .then(res => res.json())
-                .then(data => {
-                    setRecipes(data)
-                })
-                .catch(err => console.log(err))
-        }, []
-    );
-
-    const getAllRecipes=()=>{
-        fetch('/recipe/recipes')
-        .then(res => res.json())
-        .then(data => {
-            setRecipes(data)
-        })
-        .catch(err => console.log(err))
-    }
-    
-
-    const closeModal = () => {
-        setShow(false)
-    }
-
-    const showModal = (id) => {
-        setShow(true)
-        setRecipeId(id)
-        recipes.map(
-            (recipe)=>{
-                if(recipe.id==id){
-                    setValue('title',recipe.title)
-                    setValue('description',recipe.description)
-                }
-            }
-        )
-    }
-
-
-    let token=localStorage.getItem('REACT_TOKEN_AUTH_KEY')
-
-    const updateRecipe=(data)=>{
-        console.log(data)
-
-        
-
-        const requestOptions={
-            method:'PUT',
-            headers:{
-                'content-type':'application/json',
-                'Authorization':`Bearer ${JSON.parse(token)}`
-            },
-            body:JSON.stringify(data)
-        }
-
-
-        fetch(`/recipe/recipe/${recipeId}`,requestOptions)
-        .then(res=>res.json())
-        .then(data=>{
-            console.log(data)
-
-            const reload =window.location.reload()
-            reload() 
-        })
-        .catch(err=>console.log(err))
-    }
-
-
-
-    const deleteRecipe=(id)=>{
-        console.log(id)
-        
-
-        const requestOptions={
-            method:'DELETE',
-            headers:{
-                'content-type':'application/json',
-                'Authorization':`Bearer ${JSON.parse(token)}`
-            }
-        }
-
-
-        fetch(`/recipe/recipe/${id}`,requestOptions)
-        .then(res=>res.json())
-        .then(data=>{
-            console.log(data)
-            getAllRecipes()
-        
-        })
-        .catch(err=>console.log(err))
-    }
-
-
-
-
-    return (
-        <div className="recipes container">
-            <Modal
-                show={show}
-                size="lg"
-                onHide={closeModal}
-            >
-                <Modal.Header closeButton>
-                    <Modal.Title>
-                        Update Recipe
-                    </Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <form>
-                        <Form.Group>
-                            <Form.Label>Title</Form.Label>
-                            <Form.Control type="text"
-                                {...register('title', { required: true, maxLength: 25 })}
-                            />
-                        </Form.Group>
-                        {errors.title && <p style={{ color: 'red' }}><small>Title is required</small></p>}
-                        {errors.title?.type === "maxLength" && <p style={{ color: 'red' }}>
-                            <small>Title should be less than 25 characters</small>
-                        </p>}
-                        <Form.Group>
-                            <Form.Label>Description</Form.Label>
-                            <Form.Control as="textarea" rows={5}
-                                {...register('description', { required: true, maxLength: 255 })}
-                            />
-                        </Form.Group>
-                        {errors.description && <p style={{ color: 'red' }}><small>Description is required</small></p>}
-                        {errors.description?.type === "maxLength" && <p style={{ color: 'red' }}>
-                            <small>Description should be less than 255 characters</small>
-                        </p>}
-                        <br></br>
-                        <Form.Group>
-                            <Button variant="primary" onClick={handleSubmit(updateRecipe)}>
-                                Save
-                            </Button>
-                        </Form.Group>
-                    </form>
-                </Modal.Body>
-            </Modal>
-            <h1>List of Recipes</h1>
-            {
-                recipes.map(
-                    (recipe,index) => (
-                        <Recipe
-                             title={recipe.title}
-                            key={index}
-                            description={recipe.description}
-                            onClick={()=>{showModal(recipe.id)}}
-
-                            onDelete={()=>{deleteRecipe(recipe.id)}}
-
-                        />
-                    )
-                )
-            }
-        </div>
-    )
-}
-
-
-const LoggedOutHome = () => {
-    return (
-        <div className="home container">
-            <h1 className="heading">Welcome to the Recipes</h1>
-            <Link to='/signup' className="btn btn-primary btn-lg">Get Started</Link>
-        </div>
-    )
-}
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../auth';
+import { Form, Button } from 'react-bootstrap';
+import '../styles/Home.css'; // Import the updated CSS
 
 const HomePage = () => {
+    const [logged] = useAuth();
+    const [recipes, setRecipes] = useState([]);
 
-    const [logged] = useAuth()
+    useEffect(() => {
+        fetch('/recipe/recipes')
+            .then((res) => res.json())
+            .then((data) => {
+                setRecipes(data.slice(0, 3)); // Show top 3 recipes
+            })
+            .catch((err) => console.log(err));
+    }, []);
+
+    const featuredRecipe = recipes[0];
 
     return (
-        <div>
-            {logged ? <LoggedinHome /> : <LoggedOutHome />}
-        </div>
-    )
-}
+        <div className="home-page">
+            <header className="hero-section">
+                <div className="hero-logo">
+                    {featuredRecipe ? (
+                        <img
+                            src={featuredRecipe.image || '/logo_mare.png'} // Placeholder image
+                            alt={featuredRecipe.title}
+                            className="recipe-image"
+                        />
+                    ) : (
+                        <img
+                            src="/logo_mare.png" // Default image when no recipe is available
+                            alt="Default"
+                            className="recipe-image"
+                        />
+                    )}
+                </div>
+            </header>
 
-export default HomePage
+            <section className="recipes-section">
+                <h2>Top Rated Recipes</h2>
+                <div className="recipes-grid">
+                    {recipes.map((recipe, index) => (
+                        <div className="recipe-card" key={index}>
+                            <img
+                                src={recipe.image || '/default-photo.png'} // Placeholder image
+                                alt={recipe.title}
+                                className="recipe-image"
+                            />
+                            <h3>{recipe.title}</h3>
+                            <p>Author: {recipe.author}</p>
+                            <p>Rating: ⭐⭐⭐⭐☆</p>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            <section className="contact-section">
+                <h2>Contact Us</h2>
+                <Form className="contact-form">
+                    <Form.Group controlId="firstName">
+                        <Form.Control type="text" placeholder="First Name" />
+                    </Form.Group>
+                    <Form.Group controlId="lastName">
+                        <Form.Control type="text" placeholder="Last Name" />
+                    </Form.Group>
+                    <Form.Group controlId="email">
+                        <Form.Control type="email" placeholder="Email" />
+                    </Form.Group>
+                    <Form.Group controlId="message">
+                        <Form.Control as="textarea" rows={3} placeholder="Message" />
+                    </Form.Group>
+                    <Button variant="success" type="submit">
+                        Submit
+                    </Button>
+                </Form>
+            </section>
+
+            <footer className="footer">
+                <div className="social-links">
+                    <a href="#"><i className="fab fa-facebook"></i></a>
+                    <a href="#"><i className="fab fa-instagram"></i></a>
+                    <a href="#"><i className="fab fa-youtube"></i></a>
+                    <a href="#"><i className="fab fa-twitch"></i></a>
+                </div>
+            </footer>
+        </div>
+    );
+};
+
+export default HomePage;
