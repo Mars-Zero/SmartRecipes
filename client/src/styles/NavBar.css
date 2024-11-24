@@ -1,35 +1,36 @@
-/* Darker blue navbar */
 .custom-navbar {
-    background-color: #003a8c !important; /* Replace with a darker blue */
+    background-color:#002d6d !important; 
 }
 
-/* Highlight the "IT" part of the logo */
 .brand-highlight {
-    color: #28a745; /* Green color */
+    color: #28a745; 
+}
+.logo {
+    width: 64px;
+    height: 32px;
+    object-fit: contain; 
 }
 
-/* Logo section with a background */
 .logo-section {
-    background-color: #f8f9fa; /* Light gray background */
-    padding: 50px 0; /* Add padding to match the design */
+    background-color: #f8f9fa; 
+    padding: 50px 0; 
     text-align: center;
 }
 
 .logo-section h1 {
     font-size: 3rem;
     font-weight: bold;
-    color: #000; /* Dark text for the logo */
+    color: #000; 
 }
 
 .logo-section .brand-highlight {
-    color: #28a745; /* Match green from navbar */
+    color: #28a745; 
 }
 
-/* Navbar links styling */
 .navbar-nav .nav-link {
-    color: white !important; /* Keep text white */
+    color: white !important; 
 }
 
 .navbar-nav .nav-link:hover {
-    color: #d1ecf1 !important; /* Light blue hover */
+    color: #d1ecf1 !important; 
 }

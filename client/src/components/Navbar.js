@@ -40,8 +40,13 @@ const NavBar = () => {
             <nav className="navbar navbar-expand-lg navbar-dark custom-navbar"> {/* Use custom CSS for darker blue */}
                 <div className="container-fluid">
                     <div className="navbar-brand">
-                        <h1>chef<span className="brand-highlight">IT</span></h1>
+                        <img
+                            src={'/logo_mic.png'} 
+                            className="logo"
+
+                        />
                     </div>
+                    
                     <Link className="navbar-brand" to="/">Recipes</Link>
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>

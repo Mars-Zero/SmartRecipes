@@ -1,92 +1,93 @@
-import React, { useState } from 'react'
-import {Form,Button} from 'react-bootstrap'
-import { Link } from 'react-router-dom'
-import {useForm} from 'react-hook-form'
-import { login } from '../auth'
-import {useHistory} from 'react-router-dom'
+import React from 'react';
+import { Form, Button } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { login } from '../auth';
+import { useHistory } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
 
 
-const LoginPage=()=>{
-    
-    const {register,handleSubmit,reset,formState:{errors}}=useForm()
+const LoginPage = () => {
+    const { register, handleSubmit, reset, formState: { errors } } = useForm();
+    const history = useHistory();
 
-    const history=useHistory()
-    
+    const loginUser = (data) => {
+        console.log(data);
 
+        const requestOptions = {
+            method: "POST",
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        };
 
-    const loginUser=(data)=>{
-       console.log(data)
+        fetch('/auth/login', requestOptions)
+            .then(res => res.json())
+            .then(data => {
+                console.log(data.access_token);
 
-       const requestOptions={
-           method:"POST",
-           headers:{
-               'content-type':'application/json'
-           },
-           body:JSON.stringify(data)
-       }
-        
-       fetch('/auth/login',requestOptions)
-       .then(res=>res.json())
-       .then(data=>{
-           console.log(data.access_token)
-           
-           if (data){
-            login(data.access_token)
+                if (data) {
+                    login(data.access_token);
+                    history.push('/');
+                } else {
+                    alert('Invalid username or password');
+                }
+            });
 
-            history.push('/')
-           }
-           else{
-               alert('Invalid username or password')
-           }
+        reset();
+    };
 
+    return (
+        <div className="hero-section">
+            <div className="form-container">
+                <h2>Loghează-te, chiorăie mațele!</h2>
+                <form onSubmit={handleSubmit(loginUser)}>
+                    {/* Email Field */}
+                    <Form.Group>
+                        <div className="input-with-icon">
+                            <FontAwesomeIcon icon={faEnvelope} className="form-icon" />
+                            <Form.Control
+                                type="email"
+                                placeholder="E-mail"
+                                {...register('username', { required: true })}
+                            />
+                        </div>
+                        {errors.username && <small className="text-danger">E-mail is required.</small>}
+                    </Form.Group>
 
-       })
+                    {/* Password Field */}
+                    <Form.Group>
+                        <div className="input-with-icon">
+                            <FontAwesomeIcon icon={faLock} className="form-icon" />
+                            <Form.Control
+                                type="password"
+                                placeholder="Password"
+                                {...register('password', { required: true })}
+                            />
+                        </div>
+                        {errors.password && <small className="text-danger">Password is required.</small>}
+                    </Form.Group>
 
+                    {/* Submit Button */}
+                    <Button type="submit" className="login-button">
+                        Log in
+                    </Button>
 
-
-       reset()
-    }
-
-    return(
-        <div className="container">
-        <div className="form">
-            <h1>Login Page</h1>
-            <form>
-                <Form.Group>
-                    <Form.Label>Username</Form.Label>
-                    <Form.Control type="text"
-                        placeholder="Your username"
-                        {...register('username',{required:true,maxLength:25})}
-                    />
-                </Form.Group>
-                {errors.username && <p style={{color:'red'}}><small>Username is required</small></p>}
-                {errors.username?.type === "maxLength" && <p style={{color:'red'}}><small>Username should be 25 characters</small></p>}
-                <br></br>
-               
-                <Form.Group>
-                    <Form.Label>Password</Form.Label>
-                    <Form.Control type="password"
-                        placeholder="Your password"
-                        {...register('password',{required:true,minLength:8})}
-                    />
-                </Form.Group>
-                {errors.username && <p style={{color:'red'}}><small>Password is required</small></p>}
-                {errors.password?.type === "maxLength" && <p style={{color:'red'}}>
-                    <small>Password should be more than 8 characters</small>
-                    </p>}
-                <br></br>
-                <Form.Group>
-                    <Button as="sub" variant="primary" onClick={handleSubmit(loginUser)}>Login</Button>
-                </Form.Group>
-                <br></br>
-                <Form.Group>
-                    <small>Do not have an account? <Link to='/signup'>Create One</Link></small>
-                </Form.Group>
-                
-            </form>
+                    {/* Forgot Password Link */}
+                    <div className="forgot-password">
+                        <Link 
+                        style={{
+                            color: 'white',
+                            textDecoration: 'underline',
+                        }}
+                        to="/forgot-password">Forgot password?</Link>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
-    )
-}
+    );
+};
 
-export default LoginPage
+export default LoginPage;
