@@ -1,135 +1,129 @@
-import React, { useState } from 'react'
-import { Form, Button, Alert } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
-import { useForm } from 'react-hook-form'
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faPhone, faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
+import React, { useState } from 'react';
+import { Form, Button, Alert } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import '../styles/SignUp.css'; // Import the updated CSS
 
 const SignUpPage = () => {
-
-
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
-    const [show,setShow]=useState(false)
-    const [serverResponse,setServerResponse]=useState('')
+    const [showAlert, setShowAlert] = useState(false);
+    const [serverMessage, setServerMessage] = useState('');
 
-    const submitForm = (data) => {
-
-
+    const onSubmit = (data) => {
         if (data.password === data.confirmPassword) {
-
-
-            const body = {
+            const userData = {
                 username: data.username,
                 email: data.email,
-                password: data.password
-            }
+                password: data.password,
+            };
 
             const requestOptions = {
-                method: "POST",
-                headers: {
-                    'content-type': 'application/json'
-                },
-                body: JSON.stringify(body)
-            }
-
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData),
+            };
 
             fetch('/auth/signup', requestOptions)
-                .then(res => res.json())
-                .then(data =>{
-                    console.log(data)
-                    setServerResponse(data.message)
-                    setShow(true)
+                .then(response => response.json())
+                .then(data => {
+                    setServerMessage(data.message || 'Registration Successful!');
+                    setShowAlert(true);
+                    reset();
                 })
-                .catch(err => console.log(err))
-
-            reset()
+                .catch(err => {
+                    console.error(err);
+                    setServerMessage('Something went wrong. Please try again later.');
+                    setShowAlert(true);
+                });
+        } else {
+            alert('Passwords do not match!');
         }
-
-        else {
-            alert("Passwords do not match")
-        }
-
-
-    }
-
+    };
 
     return (
-        <div className="container">
-            <div className="form">
+        <div className="hero-section">
+            <div className="form-container">
+                {showAlert && (
+                    <Alert variant="success" onClose={() => setShowAlert(false)} dismissible>
+                        {serverMessage}
+                    </Alert>
+                )}
 
-                
-               {show?
-               <>
-                <Alert variant="success" onClose={() => {setShow(false)
-                }} dismissible>
-                <p>
-                   {serverResponse}
-                </p>
-                </Alert>
+                <h2>Hai, fă foamea cu noi!</h2>
 
-                <h1>Sign Up Page</h1>
-                
-                </>
-                :
-                <h1>Sign Up Page</h1>
-               
-               }
-                <form>
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    {/* Full Name Field */}
                     <Form.Group>
-                        <Form.Label>Username</Form.Label>
-                        <Form.Control type="text"
-                            placeholder="Your username"
-                            {...register("username", { required: true, maxLength: 25 })}
-                        />
+                        <div className="input-with-icon">
+                            <FontAwesomeIcon icon={faUser} className="form-icon" />
+                            <Form.Control
+                                type="text"
+                                placeholder="Full name"
+                                {...register('username', { required: true })}
+                            />
+                        </div>
+                        {errors.username && <small className="text-danger">Name is required.</small>}
+                    </Form.Group>
 
-                        {errors.username && <small style={{ color: "red" }}>Username is required</small>}
-                        {errors.username?.type === "maxLength" && <p style={{ color: "red" }}><small>Max characters should be 25 </small></p>}
-                    </Form.Group>
-                    <br></br>
+                    {/* Telephone Field */}
                     <Form.Group>
-                        <Form.Label>Email</Form.Label>
-                        <Form.Control type="email"
-                            placeholder="Your email"
-                            {...register("email", { required: true, maxLength: 80 })}
-                        />
+                        <div className="input-with-icon">
+                            <FontAwesomeIcon icon={faPhone} className="form-icon" />
+                            <Form.Control
+                                type="tel"
+                                placeholder="Telephone"
+                                {...register('telephone', { required: true })}
+                            />
+                        </div>
+                        {errors.telephone && <small className="text-danger">Phone number is required.</small>}
+                    </Form.Group>
 
-                        {errors.email && <p style={{ color: "red" }}><small>Email is required</small></p>}
+                    {/* Email Field */}
+                    <Form.Group>
+                        <div className="input-with-icon">
+                            <FontAwesomeIcon icon={faEnvelope} className="form-icon" />
+                            <Form.Control
+                                type="email"
+                                placeholder="E-mail"
+                                {...register('email', { required: true })}
+                            />
+                        </div>
+                        {errors.email && <small className="text-danger">Email is required.</small>}
+                    </Form.Group>
 
-                        {errors.email?.type === "maxLength" && <p style={{ color: "red" }}><small>Max characters should be 80</small></p>}
-                    </Form.Group>
-                    <br></br>
+                    {/* Password Field */}
                     <Form.Group>
-                        <Form.Label>Password</Form.Label>
-                        <Form.Control type="password"
-                            placeholder="Your password"
-                            {...register("password", { required: true, minLength: 8 })}
+                        <div className="input-with-icon">
+                            <FontAwesomeIcon icon={faLock} className="form-icon" />
+                            <Form.Control
+                                type="password"
+                                placeholder="Password"
+                                {...register('password', { required: true })}
+                            />
+                        </div>
+                        {errors.password && <small className="text-danger">Password is required.</small>}
+                    </Form.Group>
 
-                        />
+                    {/* Confirm Password Field */}
+                    <Form.Group>
+                        <div className="input-with-icon">
+                            <FontAwesomeIcon icon={faLock} className="form-icon" />
+                            <Form.Control
+                                type="password"
+                                placeholder="Confirm Password"
+                                {...register('confirmPassword', { required: true })}
+                            />
+                        </div>
+                        {errors.confirmPassword && <small className="text-danger">Please confirm your password.</small>}
+                    </Form.Group>
 
-                        {errors.password && <p style={{ color: "red" }}><small>Password is required</small></p>}
-                        {errors.password?.type === "minLength" && <p style={{ color: "red" }}><small>Min characters should be 8</small></p>}
-                    </Form.Group>
-                    <br></br>
-                    <Form.Group>
-                        <Form.Label>Confirm Password</Form.Label>
-                        <Form.Control type="password" placeholder="Your password"
-                            {...register("confirmPassword", { required: true, minLength: 8 })}
-                        />
-                        {errors.confirmPassword && <p style={{ color: "red" }}><small>Confirm Password is required</small></p>}
-                        {errors.confirmPassword?.type === "minLength" && <p style={{ color: "red" }}><small>Min characters should be 8</small></p>}
-                    </Form.Group>
-                    <br></br>
-                    <Form.Group>
-                        <Button as="sub" variant="primary" onClick={handleSubmit(submitForm)}>SignUp</Button>
-                    </Form.Group>
-                    <br></br>
-                    <Form.Group>
-                        <small>Already have an account, <Link to='/login'>Log In</Link></small>
-                    </Form.Group>
-                    <br></br>
+                    <Button type="submit">Sign up</Button>
                 </form>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default SignUpPage
+export default SignUpPage;

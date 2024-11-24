@@ -6,6 +6,7 @@ class Recipe:
     id:int primary key
     title:str 
     description:str (text)
+    rating: float
 """
 
 
@@ -13,6 +14,7 @@ class Recipe(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     title = db.Column(db.String(), nullable=False)
     description = db.Column(db.Text(), nullable=False)
+    # rating = db.Column(db.Double(), nullable=False)
 
     def __repr__(self):
         return f"<Recipe {self.title} >"
