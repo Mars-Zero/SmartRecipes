@@ -51,7 +51,7 @@ const LoginPage = () => {
                             <Form.Control
                                 type="email"
                                 placeholder="E-mail"
-                                {...register('username', { required: true })}
+                                {...register('email', { required: true })}
                             />
                         </div>
                         {errors.username && <small className="text-danger">E-mail is required.</small>}

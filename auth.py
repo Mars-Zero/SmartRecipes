@@ -59,11 +59,10 @@ class Login(Resource):
     def post(self):
         data = request.get_json()
 
-        username = data.get("username")
+        email = data.get("email")
         password = data.get("password")
 
-        db_user = User.query.filter_by(username=username).first()
-
+        db_user = User.query.filter_by(email=email).first()
         if db_user and check_password_hash(db_user.password, password):
 
             access_token = create_access_token(identity=db_user.username)
