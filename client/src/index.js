@@ -13,6 +13,8 @@ import HomePage from './components/Home';
 import SignUpPage from './components/SignUp';
 import LoginPage from './components/Login';
 import CreateRecipePage from './components/CreateRecipe';
+import Recipe from './components/Recipe';
+import RecipesPage from './components/RecipePage';
 
 
 
@@ -33,6 +35,9 @@ const App=()=>{
                 </Route>
                 <Route path="/signup">
                     <SignUpPage/>                
+                </Route>
+                <Route path="/recipes">
+                    <RecipesPage/>                
                 </Route>    
                 <Route path="/">
                     <HomePage/>

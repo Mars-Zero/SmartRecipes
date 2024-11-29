@@ -1,20 +1,21 @@
-import React from 'react'
-import { Button, Card ,Modal} from 'react-bootstrap';
+import React from 'react';
+import { Card, Button } from 'react-bootstrap';
 
-
-const Recipe=({title,description,onClick,onDelete})=>{
-    return(
-        <Card className="recipe">
+const Recipe = ({ title, description, imageUrl, rating, onClick, onDelete }) => {
+    return (
+        <Card className="mb-4 shadow-sm">
+            <Card.Img variant="top" src={"./default_photo.png"} alt={title} style={{ height: '200px', objectFit: 'cover' }} />
             <Card.Body>
                 <Card.Title>{title}</Card.Title>
-                <p>{description}</p>
-                <Button variant='primary' onClick={onClick}>Update</Button>
-                {' '}
-                <Button variant='danger' onClick={onDelete}>Delete</Button>
+                <Card.Text>{description}</Card.Text>
+                
+                <div className="d-flex justify-content-between">
+                    <p>Author: </p>
+                    <p>Rating: ⭐⭐⭐⭐☆</p>
+                </div>
             </Card.Body>
         </Card>
-    )
-}
-
+    );
+};
 
 export default Recipe;

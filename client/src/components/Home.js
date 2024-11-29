@@ -18,7 +18,7 @@ const HomePage = () => {
     }, []);
 
     const featuredRecipe = recipes[0];
-
+    
     return (
         <div className="home-page">
             <header className="hero-section">

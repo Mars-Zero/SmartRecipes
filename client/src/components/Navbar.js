@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth, logout } from '../auth';
+import { useNavigate } from 'react-router-dom'; 
 import '../styles/NavBar.css'; // Ensure your custom CSS file is linked correctly
 
 const LoggedInLinks = () => {
@@ -42,25 +43,21 @@ const LogoutButton = () => {
 
 const NavBar = () => {
     const [logged] = useAuth();
-
     return (
         <>
             <nav className="navbar navbar-expand-lg navbar-dark custom-navbar">
                 <div className="container-fluid">
                     {/* Logo Section */}
-                    <div className="navbar-brand">
-                        <img
-                            src={'/logo_mic.png'}
-                            className="logo"
-                            alt="Logo"
-                        />
-                    </div>
+                    <Link to="/">
+                        <div className="navbar-brand">
+                            <img
+                                src={'/logo_mic.png'}
+                                className="logo"
+                                alt="Logo"
+                            />
+                        </div>
+                    </Link>
 
-                    {/* Navbar Brand */}
-                    <Link className="navbar-brand" to="/">Recipes</Link>
-                    {/* <Link className="navbar-brand" to="/create_recipe">Add recipe</Link> */}
-
-                    {/* Navbar Toggler for mobile view */}
                     <button
                         className="navbar-toggler"
                         type="button"
@@ -77,6 +74,13 @@ const NavBar = () => {
                     <div className="collapse navbar-collapse" id="navbarNav">
                         {/* Left Links */}
                         <ul className="navbar-nav">
+                            <li className="nav-item">
+                                {logged ? (
+                                    <Link className="nav-link active" to="/recipes">Recipes</Link>
+                                ) : (
+                                    <Link className="nav-link active" to="/login">Recipes</Link>
+                                )}
+                            </li>
                             {logged ? <LoggedInLinks /> : null}
                         </ul>
 
