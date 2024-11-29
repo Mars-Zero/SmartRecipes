@@ -30,6 +30,8 @@ const LoggedOutLinks = () => {
 const LogoutButton = () => {
     return (
         <li className="nav-item ms-auto"> {/* Ensure right alignment */}
+        <Link to="/">
+                     
             <button
                 className="btn btn-link nav-link active"
                 onClick={() => { logout(); }}
@@ -37,6 +39,7 @@ const LogoutButton = () => {
             >
                 Log Out
             </button>
+                    </Link>
         </li>
     );
 };
