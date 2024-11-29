@@ -81,27 +81,46 @@ body {
 }
 
 .contact-section {
-    padding: 30px 20px;
+    padding: 20px;
     text-align: center;
 }
 
 .contact-form {
     max-width: 600px;
     margin: 0 auto;
-    display: grid;
-    gap: 10px;
+}
+
+.form-group-with-icon {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.form-group-with-icon i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #28a745;
+}
+
+.form-group-with-icon .form-control {
+    padding-left: 35px; /* Add space for the icon */
 }
 
 .footer {
-    background: #001f5b;
+    background-color: #002855;
     color: white;
+    padding: 10px 0;
     text-align: center;
-    padding: 20px 0;
 }
 
-.social-links a {
+.footer .social-links a {
     color: white;
     margin: 0 10px;
     font-size: 1.5rem;
-    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer .social-links a:hover {
+    color: #28a745;
 }

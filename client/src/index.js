@@ -15,6 +15,7 @@ import LoginPage from './components/Login';
 import CreateRecipePage from './components/CreateRecipe';
 import Recipe from './components/Recipe';
 import RecipesPage from './components/RecipePage';
+import ProfilePage from './components/ProfilePage';
 
 
 
@@ -38,6 +39,9 @@ const App=()=>{
                 </Route>
                 <Route path="/recipes">
                     <RecipesPage/>                
+                </Route> 
+                <Route path="/profile">
+                    <ProfilePage/>                
                 </Route>    
                 <Route path="/">
                     <HomePage/>

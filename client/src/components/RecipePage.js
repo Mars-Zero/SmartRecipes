@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Button, Modal, Form } from 'react-bootstrap';
+import { Container, Row, Col, Button, Modal, Form, InputGroup, Dropdown } from 'react-bootstrap';
 import Recipe from './Recipe'; // Import the Recipe component
 
 const RecipesPage = () => {
     const [recipes, setRecipes] = useState([]);
+    const [filteredRecipes, setFilteredRecipes] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [selectedRecipe, setSelectedRecipe] = useState(null);
     const [newRecipe, setNewRecipe] = useState({ title: '', description: '' });
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filterCategory, setFilterCategory] = useState('All');
+    const [filterSort, setFilterSort] = useState('None');
 
     const API_URL = '/recipe/recipes'; // Adjust the URL as per your API setup
 
@@ -16,73 +20,36 @@ const RecipesPage = () => {
             const response = await fetch(API_URL);
             const data = await response.json();
             setRecipes(data);
+            setFilteredRecipes(data); // Initialize filtered recipes
         } catch (error) {
             console.error('Error fetching recipes:', error);
         }
     };
 
-    // Add a recipe
-    const addRecipe = async () => {
-        try {
-            const token = localStorage.getItem('REACT_TOKEN_AUTH_KEY');
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${JSON.parse(token)}`,
-                },
-                body: JSON.stringify(newRecipe),
-            });
+    // Search and filter recipes
+    const filterRecipes = () => {
+        let filtered = [...recipes];
 
-            if (response.ok) {
-                const createdRecipe = await response.json();
-                setRecipes((prev) => [...prev, createdRecipe]);
-                setNewRecipe({ title: '', description: '' });
-                setShowModal(false);
-            }
-        } catch (error) {
-            console.error('Error adding recipe:', error);
+        // Filter by search query
+        if (searchQuery.trim()) {
+            filtered = filtered.filter((recipe) =>
+                recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
+            );
         }
-    };
 
-    // Update a recipe
-    const updateRecipe = async (id, updatedData) => {
-        try {
-            const token = localStorage.getItem('REACT_TOKEN_AUTH_KEY');
-            const response = await fetch(`/recipe/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${JSON.parse(token)}`,
-                },
-                body: JSON.stringify(updatedData),
-            });
-
-            if (response.ok) {
-                const updatedRecipe = await response.json();
-                setRecipes((prev) =>
-                    prev.map((recipe) => (recipe.id === id ? updatedRecipe : recipe))
-                );
-            }
-        } catch (error) {
-            console.error('Error updating recipe:', error);
+        // Filter by category
+        if (filterCategory !== 'All') {
+            filtered = filtered.filter((recipe) => recipe.category === filterCategory);
         }
-    };
 
-    // Delete a recipe
-    const deleteRecipe = async (id) => {
-        try {
-            const token = localStorage.getItem('REACT_TOKEN_AUTH_KEY');
-            await fetch(`/recipe/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    Authorization: `Bearer ${JSON.parse(token)}`,
-                },
-            });
-            setRecipes((prev) => prev.filter((recipe) => recipe.id !== id));
-        } catch (error) {
-            console.error('Error deleting recipe:', error);
+        // Sort recipes
+        if (filterSort === 'Rating') {
+            filtered.sort((a, b) => b.rating - a.rating); // Descending order
+        } else if (filterSort === 'Alphabetical') {
+            filtered.sort((a, b) => a.title.localeCompare(b.title)); // Alphabetical order
         }
+
+        setFilteredRecipes(filtered);
     };
 
     // Handle modal close
@@ -100,13 +67,13 @@ const RecipesPage = () => {
 
     // Submit recipe (either add or update)
     const handleSubmit = () => {
-        if (selectedRecipe) {
-            updateRecipe(selectedRecipe.id, newRecipe);
-        } else {
-            addRecipe();
-        }
         handleCloseModal();
     };
+
+    // Re-run filtering when search or filter changes
+    useEffect(() => {
+        filterRecipes();
+    }, [searchQuery, filterCategory, filterSort]);
 
     useEffect(() => {
         fetchRecipes();
@@ -118,14 +85,50 @@ const RecipesPage = () => {
                 <h1>Recipes</h1>
                 <Button variant="success" onClick={() => handleOpenModal()}>Add Recipe</Button>
             </div>
+
+            {/* Search and Filter Section */}
+            <div className="search-and-filter mb-4">
+                <InputGroup className="mb-3">
+                    <Form.Control
+                        type="text"
+                        placeholder="Search for recipes..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </InputGroup>
+                <div className="d-flex gap-3">
+                    <Dropdown>
+                        <Dropdown.Toggle variant="outline-secondary" id="dropdown-category">
+                            Category: {filterCategory}
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                            <Dropdown.Item onClick={() => setFilterCategory('All')}>All</Dropdown.Item>
+                            <Dropdown.Item onClick={() => setFilterCategory('Desserts')}>Desserts</Dropdown.Item>
+                            <Dropdown.Item onClick={() => setFilterCategory('Main Course')}>Main Course</Dropdown.Item>
+                            <Dropdown.Item onClick={() => setFilterCategory('Appetizers')}>Appetizers</Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
+
+                    <Dropdown>
+                        <Dropdown.Toggle variant="outline-secondary" id="dropdown-sort">
+                            Sort: {filterSort}
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                            <Dropdown.Item onClick={() => setFilterSort('None')}>None</Dropdown.Item>
+                            <Dropdown.Item onClick={() => setFilterSort('Rating')}>Rating</Dropdown.Item>
+                            <Dropdown.Item onClick={() => setFilterSort('Alphabetical')}>Alphabetical</Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </div>
+            </div>
+
             <Row>
-                {recipes.map((recipe) => (
+                {filteredRecipes.map((recipe) => (
                     <Col key={recipe.id} md={4}>
                         <Recipe
                             title={recipe.title}
                             description={recipe.description}
                             onClick={() => handleOpenModal(recipe)}
-                            onDelete={() => deleteRecipe(recipe.id)}
                         />
                     </Col>
                 ))}
